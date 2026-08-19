@@ -367,7 +367,7 @@
 
     const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const SINGLE_PREFIXES = new Set(["a", "t", "b", "c", "d", "e"]);
-    const VARIANT_PREFIXES = new Set(["tv", "bv"]);
+    const VARIANT_PREFIXES = new Set(["nt", "nb"]);
 
     function normalizeSequence(value) {
       return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z ]/g, "");
@@ -397,9 +397,9 @@
       const key = lengths.join("");
       if (lengths.length >= 1 && lengths.length <= 4 && lengths.every(length => length === 1)) return "a";
       if (key === "2") return "d";
-      if (key === "21") return "tv";
+      if (key === "21") return "nt";
       if (key === "211") return "t";
-      if (key === "12") return "bv";
+      if (key === "12") return "nb";
       if (key === "112") return "b";
       if (key === "22") return "c";
       if (key === "121") return "e";
@@ -554,9 +554,9 @@
         return Array(length).fill(1);
       }
       if (chunk.prefix === "d") return [2];
-      if (chunk.prefix === "tv") return [2, 1];
+      if (chunk.prefix === "nt") return [2, 1];
       if (chunk.prefix === "t") return [2, 1, 1];
-      if (chunk.prefix === "bv") return [1, 2];
+      if (chunk.prefix === "nb") return [1, 2];
       if (chunk.prefix === "b") return [1, 1, 2];
       if (chunk.prefix === "c") return [2, 2];
       if (chunk.prefix === "e") return [1, 2, 1];
@@ -586,7 +586,7 @@
     }
 
     function decryptText(text) {
-      const tokenPattern = /(?:(?:bv|tv|[atbcde])(?:[A-Z]|p(?:i|2)?)+)+/g;
+      const tokenPattern = /(?:(?:nb|nt|[atbcde])(?:[A-Z]|p(?:i|2)?)+)+/g;
       let output = "";
       let cursor = 0;
       let match;
