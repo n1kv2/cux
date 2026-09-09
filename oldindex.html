@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Traduttore cUX.">
+  <title>cUX</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #edf3ee;
+      --muted: #aeb7af;
+      --line: #2f3a35;
+      --surface: #1b241f;
+      --soft: #101714;
+      --accent: #6bb697;
+      --accent-hover: #82c7a7;
+      --danger: #f29d97;
+      --shadow: 0 24px 70px rgba(5, 10, 8, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--soft);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--soft);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .identity {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .identity h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 760;
+      letter-spacing: -0.07em;
+      line-height: 0.9;
+    }
+
+    .identity span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .clear-button,
+    .copy-button,
+    .swap-button,
+    .mode-button,
+    .translate-button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .clear-button {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+
+    .clear-button:hover {
+      background: var(--soft);
+    }
+
+    .translator {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 12px;
+      background: var(--soft);
+    }
+
+    .mode-button {
+      padding: 9px 14px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 720;
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .mode-button[aria-selected="true"] {
+      color: var(--ink);
+      background: var(--surface);
+      box-shadow: 0 1px 5px rgba(25, 29, 26, 0.09);
+    }
+
+    .swap-button {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--surface);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .swap-button:hover {
+      background: var(--soft);
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .panel + .panel {
+      border-left: 1px solid var(--line);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 30px;
+      margin-bottom: 12px;
+    }
+
+    .panel-label {
+      font-size: 0.82rem;
+      font-weight: 780;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .status[data-tone="error"] {
+      color: var(--danger);
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 310px;
+      resize: vertical;
+      border: 0;
+      outline: 0;
+      padding: 4px 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    textarea::placeholder {
+      color: #b0b2ac;
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 46px;
+      margin-top: 16px;
+    }
+
+    .translate-button,
+    .copy-button {
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+
+    .translate-button {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .translate-button:hover {
+      background: var(--accent-hover);
+    }
+
+    .copy-button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .copy-button:hover {
+      background: var(--soft);
+    }
+
+    .message {
+      min-height: 20px;
+      margin: 14px 4px 0;
+      color: var(--danger);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(35, 61, 49, 0.22);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 24px, 680px);
+        padding: 28px 0;
+      }
+
+      .masthead {
+        align-items: center;
+      }
+
+      .identity span {
+        display: none;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .mode-switch {
+        flex: 1;
+      }
+
+      .mode-button {
+        flex: 1;
+        padding-inline: 8px;
+      }
+
+      .panels {
+        grid-template-columns: 1fr;
+      }
+
+      .panel + .panel {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      textarea {
+        min-height: 210px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="identity">
+        <h1>cUX</h1>
+        <span>Traduttore</span>
+      </div>
+      <button class="clear-button" id="clearButton" type="button">Svuota</button>
+    </header>
+
+    <section class="translator" aria-label="Traduttore cUX">
+      <div class="toolbar">
+        <div class="mode-switch" role="tablist" aria-label="Direzione">
+          <button class="mode-button" id="encodeMode" type="button" role="tab" aria-selected="true">Italiano → cUX</button>
+          <button class="mode-button" id="decodeMode" type="button" role="tab" aria-selected="false">cUX → Italiano</button>
+        </div>
+        <button class="swap-button" id="swapButton" type="button" aria-label="Inverti direzione" title="Inverti direzione">⇄</button>
+      </div>
+
+      <div class="panels">
+        <section class="panel">
+          <div class="panel-head">
+            <label class="panel-label" id="sourceLabel" for="sourceText">Italiano</label>
+          </div>
+          <textarea id="sourceText" placeholder="Inserisci il testo" spellcheck="false" autocomplete="off" autocapitalize="off" data-gramm="false"></textarea>
+          <div class="panel-actions">
+            <button class="translate-button" id="translateButton" type="button">Traduci</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <label class="panel-label" id="targetLabel" for="targetText">cUX</label>
+            <span class="status" id="status" aria-live="polite"></span>
+          </div>
+          <textarea id="targetText" readonly spellcheck="false" aria-label="Risultato"></textarea>
+          <div class="panel-actions">
+            <button class="copy-button" id="copyButton" type="button">Copia</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <p class="message" id="message" role="alert"></p>
+  </main>
+
+  <script>
+    "use strict";
+
+    const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const SINGLE_PREFIXES = new Set(["a", "t", "b", "c", "d", "e"]);
+    const VARIANT_PREFIXES = new Set(["nt", "nb"]);
+
+    function normalizeSequence(value) {
+      return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z ]/g, "");
+    }
+
+    function letterToNumber(letter) {
+      return ALPHABET.indexOf(letter) + 1;
+    }
+
+    function numberToLetter(number) {
+      return number >= 1 && number <= 26 ? ALPHABET[number - 1] : "";
+    }
+
+    function numberToSymbol(number) {
+      return number === 27 ? " " : numberToLetter(number);
+    }
+
+    function permuteBlock(raw) {
+      return raw[2] + raw[0] + raw[3] + raw[1];
+    }
+
+    function unpermuteBlock(permuted) {
+      return permuted[1] + permuted[3] + permuted[0] + permuted[2];
+    }
+
+    function typeFromLengths(lengths) {
+      const key = lengths.join("");
+      if (lengths.length >= 1 && lengths.length <= 4 && lengths.every(length => length === 1)) return "a";
+      if (key === "2") return "d";
+      if (key === "21") return "nt";
+      if (key === "211") return "t";
+      if (key === "12") return "nb";
+      if (key === "112") return "b";
+      if (key === "22") return "c";
+      if (key === "121") return "e";
+      return "";
+    }
+
+    function encodePermutedDigits(digits) {
+      const tokens = [];
+      let index = 0;
+
+      while (index < digits.length) {
+        const pairText = digits.slice(index, index + 2);
+        const pair = pairText.length === 2 ? Number(pairText) : 0;
+
+        if (digits[index] !== "0" && pair >= 10 && pair <= 26) {
+          tokens.push(numberToLetter(pair));
+          index += 2;
+          continue;
+        }
+
+        if (digits[index] === "0") {
+          let run = 1;
+          while (index + run < digits.length && digits[index + run] === "0") run += 1;
+          while (run >= 3) {
+            tokens.push("p2");
+            index += 3;
+            run -= 3;
+          }
+          if (run === 2) {
+            tokens.push("pi");
+            index += 2;
+          } else if (run === 1) {
+            tokens.push("p");
+            index += 1;
+          }
+          continue;
+        }
+
+        tokens.push(numberToLetter(Number(digits[index])));
+        index += 1;
+      }
+
+      return tokens.join("");
+    }
+
+    function makeBlock(content, parts) {
+      const type = typeFromLengths(parts.map(part => part.length));
+      if (!type) throw new Error("Combinazione non valida.");
+      const raw = content.padEnd(4, "0");
+      return type + encodePermutedDigits(permuteBlock(raw));
+    }
+
+    function encryptWord(input) {
+      const sequence = normalizeSequence(input);
+      if (!sequence) return "";
+      const blocks = [];
+      let content = "";
+      let parts = [];
+
+      function finish() {
+        if (!content) return;
+        blocks.push(makeBlock(content, parts));
+        content = "";
+        parts = [];
+      }
+
+      for (const symbol of sequence) {
+        const code = symbol === " " ? "27" : String(letterToNumber(symbol));
+        if (content.length + code.length > 4) finish();
+        content += code;
+        parts.push(code);
+        if (content.length === 4) finish();
+      }
+
+      finish();
+      return blocks.join("");
+    }
+
+    function encryptText(text) {
+      return text.replace(/[A-Za-zÀ-ÖØ-öø-ÿ ]+/g, encryptWord);
+    }
+
+    function decodePayload(payload) {
+      let digits = "";
+      let index = 0;
+
+      while (index < payload.length) {
+        const character = payload[index];
+        if (/[A-Z]/.test(character)) {
+          digits += String(letterToNumber(character));
+          index += 1;
+        } else if (character === "p") {
+          if (payload[index + 1] === "2") {
+            digits += "000";
+            index += 2;
+          } else if (payload[index + 1] === "i") {
+            digits += "00";
+            index += 2;
+          } else {
+            digits += "0";
+            index += 1;
+          }
+        } else {
+          throw new Error("Il testo non è valido.");
+        }
+      }
+
+      if (digits.length !== 4) throw new Error("Il testo non è valido.");
+      return digits;
+    }
+
+    function prefixAt(value, index) {
+      const variant = value.slice(index, index + 2);
+      if (VARIANT_PREFIXES.has(variant)) return variant;
+      return SINGLE_PREFIXES.has(value[index]) ? value[index] : "";
+    }
+
+    function parseChunks(cipherWord) {
+      const chunks = [];
+      let index = 0;
+
+      while (index < cipherWord.length) {
+        const prefix = prefixAt(cipherWord, index);
+        if (!prefix) throw new Error("Il testo non è valido.");
+        index += prefix.length;
+        const start = index;
+
+        while (index < cipherWord.length && !prefixAt(cipherWord, index)) {
+          if (/[A-Z]/.test(cipherWord[index])) {
+            index += 1;
+          } else if (cipherWord[index] === "p") {
+            if (cipherWord[index + 1] === "2" || cipherWord[index + 1] === "i") index += 2;
+            else index += 1;
+          } else {
+            throw new Error("Il testo non è valido.");
+          }
+        }
+
+        const payload = cipherWord.slice(start, index);
+        if (!payload) throw new Error("Il testo non è valido.");
+        chunks.push({ prefix, raw: unpermuteBlock(decodePayload(payload)) });
+      }
+
+      return chunks;
+    }
+
+    function layoutForChunk(chunk) {
+      if (chunk.prefix === "a") {
+        let length = 4;
+        while (length > 0 && chunk.raw[length - 1] === "0") length -= 1;
+        if (length < 1 || !/^[1-9]+$/.test(chunk.raw.slice(0, length))) throw new Error("Il testo non è valido.");
+        return Array(length).fill(1);
+      }
+      if (chunk.prefix === "d") return [2];
+      if (chunk.prefix === "nt") return [2, 1];
+      if (chunk.prefix === "t") return [2, 1, 1];
+      if (chunk.prefix === "nb") return [1, 2];
+      if (chunk.prefix === "b") return [1, 1, 2];
+      if (chunk.prefix === "c") return [2, 2];
+      if (chunk.prefix === "e") return [1, 2, 1];
+      throw new Error("Il testo non è valido.");
+    }
+
+    function decodeChunk(chunk) {
+      const layout = layoutForChunk(chunk);
+      const contentLength = layout.reduce((total, length) => total + length, 0);
+      if (chunk.raw.slice(contentLength) !== "0".repeat(4 - contentLength)) throw new Error("Il testo non è valido.");
+
+      let output = "";
+      let index = 0;
+      for (const length of layout) {
+        const digits = chunk.raw.slice(index, index + length);
+        const value = Number(digits);
+        if (length === 1 && (value < 1 || value > 9)) throw new Error("Il testo non è valido.");
+        if (length === 2 && (value < 10 || value > 27)) throw new Error("Il testo non è valido.");
+        output += numberToSymbol(value);
+        index += length;
+      }
+      return output;
+    }
+
+    function decryptWord(cipherWord) {
+      return parseChunks(cipherWord).map(decodeChunk).join("");
+    }
+
+    function decryptText(text) {
+      const tokenPattern = /(?:(?:nb|nt|[atbcde])(?:[A-Z]|p(?:i|2)?)+)+/g;
+      let output = "";
+      let cursor = 0;
+      let match;
+
+      while ((match = tokenPattern.exec(text)) !== null) {
+        output += text.slice(cursor, match.index);
+        output += decryptWord(match[0]);
+        cursor = match.index + match[0].length;
+      }
+
+      output += text.slice(cursor);
+      return output;
+    }
+
+    function init() {
+      const source = document.getElementById("sourceText");
+      const target = document.getElementById("targetText");
+      const sourceLabel = document.getElementById("sourceLabel");
+      const targetLabel = document.getElementById("targetLabel");
+      const encodeMode = document.getElementById("encodeMode");
+      const decodeMode = document.getElementById("decodeMode");
+      const status = document.getElementById("status");
+      const message = document.getElementById("message");
+      let direction = "encode";
+
+      function setDirection(next, swap = false) {
+        if (swap) {
+          const oldSource = source.value;
+          source.value = target.value;
+          target.value = oldSource;
+        }
+        direction = next;
+        const encoding = direction === "encode";
+        encodeMode.setAttribute("aria-selected", String(encoding));
+        decodeMode.setAttribute("aria-selected", String(!encoding));
+        sourceLabel.textContent = encoding ? "Italiano" : "cUX";
+        targetLabel.textContent = encoding ? "cUX" : "Italiano";
+        source.placeholder = encoding ? "Inserisci il testo" : "Inserisci il testo cUX";
+        status.textContent = "";
+        status.dataset.tone = "";
+        message.textContent = "";
+      }
+
+      function translate() {
+        message.textContent = "";
+        status.textContent = "";
+        status.dataset.tone = "";
+        if (!source.value) {
+          target.value = "";
+          return;
+        }
+        try {
+          target.value = direction === "encode" ? encryptText(source.value) : decryptText(source.value);
+          status.textContent = "Fatto";
+        } catch (error) {
+          target.value = "";
+          status.textContent = "Errore";
+          status.dataset.tone = "error";
+          message.textContent = error instanceof Error ? error.message : String(error);
+        }
+      }
+
+      encodeMode.addEventListener("click", () => setDirection("encode"));
+      decodeMode.addEventListener("click", () => setDirection("decode"));
+      document.getElementById("translateButton").addEventListener("click", translate);
+      document.getElementById("swapButton").addEventListener("click", () => setDirection(direction === "encode" ? "decode" : "encode", true));
+      document.getElementById("clearButton").addEventListener("click", () => {
+        source.value = "";
+        target.value = "";
+        status.textContent = "";
+        message.textContent = "";
+        source.focus();
+      });
+      document.getElementById("copyButton").addEventListener("click", async () => {
+        if (!target.value) return;
+        try {
+          if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(target.value);
+          else {
+            target.focus();
+            target.select();
+            document.execCommand("copy");
+            source.focus();
+          }
+          status.textContent = "Copiato";
+        } catch (_) {
+          message.textContent = "Seleziona il risultato e copialo manualmente.";
+        }
+      });
+      source.addEventListener("keydown", event => {
+        if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault();
+          translate();
+        }
+      });
+
+      source.focus();
+    }
+
+    if (typeof module !== "undefined" && module.exports) {
+      module.exports = { encryptWord, encryptText, decryptWord, decryptText };
+    }
+
+    if (typeof document !== "undefined") init();
+  </script>
+</body>
+</html>
+
+
+
+
+<!--nik-->
