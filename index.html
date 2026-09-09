@@ -1,702 +1,141 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Traduttore cUX.">
-  <title>cUX</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #171816;
-      --muted: #70736d;
-      --line: #dedfd9;
-      --surface: #ffffff;
-      --soft: #f5f5f1;
-      --accent: #233d31;
-      --accent-hover: #182c23;
-      --danger: #9b342d;
-      --shadow: 0 24px 70px rgba(29, 34, 30, 0.09);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-width: 320px;
-      background: var(--soft);
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      background: var(--soft);
-      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    button,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      color: inherit;
-    }
-
-    .shell {
-      width: min(1100px, calc(100% - 40px));
-      margin: 0 auto;
-      padding: 48px 0;
-    }
-
-    .masthead {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 20px;
-    }
-
-    .identity {
-      display: flex;
-      align-items: baseline;
-      gap: 14px;
-    }
-
-    .identity h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 760;
-      letter-spacing: -0.07em;
-      line-height: 0.9;
-    }
-
-    .identity span {
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .clear-button,
-    .copy-button,
-    .swap-button,
-    .mode-button,
-    .translate-button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    .clear-button {
-      min-height: 44px;
-      padding: 0 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface);
-      font-size: 0.9rem;
-      font-weight: 750;
-    }
-
-    .clear-button:hover {
-      background: var(--soft);
-    }
-
-    .translator {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .mode-switch {
-      display: inline-flex;
-      gap: 4px;
-      padding: 4px;
-      border-radius: 12px;
-      background: var(--soft);
-    }
-
-    .mode-button {
-      padding: 9px 14px;
-      border-radius: 9px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 720;
-      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
-    }
-
-    .mode-button[aria-selected="true"] {
-      color: var(--ink);
-      background: var(--surface);
-      box-shadow: 0 1px 5px rgba(25, 29, 26, 0.09);
-    }
-
-    .swap-button {
-      width: 38px;
-      height: 38px;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: var(--surface);
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-
-    .swap-button:hover {
-      background: var(--soft);
-    }
-
-    .panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .panel {
-      min-width: 0;
-      padding: 24px;
-    }
-
-    .panel + .panel {
-      border-left: 1px solid var(--line);
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 30px;
-      margin-bottom: 12px;
-    }
-
-    .panel-label {
-      font-size: 0.82rem;
-      font-weight: 780;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .status {
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 650;
-    }
-
-    .status[data-tone="error"] {
-      color: var(--danger);
-    }
-
-    textarea {
-      display: block;
-      width: 100%;
-      min-height: 310px;
-      resize: vertical;
-      border: 0;
-      outline: 0;
-      padding: 4px 0;
-      color: var(--ink);
-      background: transparent;
-      font-size: clamp(1.08rem, 2vw, 1.35rem);
-      line-height: 1.65;
-      letter-spacing: 0.01em;
-    }
-
-    textarea::placeholder {
-      color: #b0b2ac;
-    }
-
-    .panel-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      min-height: 46px;
-      margin-top: 16px;
-    }
-
-    .translate-button,
-    .copy-button {
-      min-height: 44px;
-      padding: 0 18px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      font-weight: 750;
-    }
-
-    .translate-button {
-      color: #fff;
-      background: var(--accent);
-    }
-
-    .translate-button:hover {
-      background: var(--accent-hover);
-    }
-
-    .copy-button {
-      border: 1px solid var(--line);
-      background: var(--surface);
-    }
-
-    .copy-button:hover {
-      background: var(--soft);
-    }
-
-    .message {
-      min-height: 20px;
-      margin: 14px 4px 0;
-      color: var(--danger);
-      font-size: 0.84rem;
-      line-height: 1.45;
-    }
-
-    button:focus-visible,
-    textarea:focus-visible {
-      outline: 3px solid rgba(35, 61, 49, 0.22);
-      outline-offset: 2px;
-    }
-
-    @media (max-width: 760px) {
-      .shell {
-        width: min(100% - 24px, 680px);
-        padding: 28px 0;
-      }
-
-      .masthead {
-        align-items: center;
-      }
-
-      .identity span {
-        display: none;
-      }
-
-      .toolbar {
-        align-items: stretch;
-      }
-
-      .mode-switch {
-        flex: 1;
-      }
-
-      .mode-button {
-        flex: 1;
-        padding-inline: 8px;
-      }
-
-      .panels {
-        grid-template-columns: 1fr;
-      }
-
-      .panel + .panel {
-        border-top: 1px solid var(--line);
-        border-left: 0;
-      }
-
-      textarea {
-        min-height: 210px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Traduttore cUX.">
+<title>cUX</title>
+<style>
+:root{color-scheme:light;--ink:#171816;--muted:#70736d;--line:#dedfd9;--surface:#fff;--soft:#f5f5f1;--accent:#233d31;--accent-hover:#182c23;--danger:#9b342d;--shadow:0 24px 70px rgba(29,34,30,.09)}
+*{box-sizing:border-box}
+html{min-width:320px;background:var(--soft)}
+body{margin:0;min-height:100vh;color:var(--ink);background:var(--soft);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,textarea,input{font:inherit}button{color:inherit}
+.shell{width:min(1100px,calc(100% - 40px));margin:0 auto;padding:48px 0}
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px}
+.identity{display:flex;align-items:baseline;gap:14px}
+.identity h1{margin:0;font-size:clamp(2rem,5vw,3.5rem);font-weight:760;letter-spacing:-.07em;line-height:.9;cursor:pointer}
+.identity span{color:var(--muted);font-size:.82rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.clear-button,.copy-button,.swap-button,.mode-button,.translate-button{border:0;cursor:pointer}
+.clear-button{min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:.9rem;font-weight:750}
+.clear-button:hover{background:var(--soft)}
+.translator{overflow:hidden;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:var(--shadow)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.mode-switch{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--soft)}
+.mode-button{padding:9px 14px;border-radius:9px;background:transparent;color:var(--muted);font-size:.88rem;font-weight:720;transition:background 160ms ease,color 160ms ease,box-shadow 160ms ease}
+.mode-button[aria-selected=true]{color:var(--ink);background:var(--surface);box-shadow:0 1px 5px rgba(25,29,26,.09)}
+.swap-button{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:var(--surface);font-size:1.1rem;line-height:1}
+.swap-button:hover{background:var(--soft)}
+/* barra livello */
+.levelbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:#fafaf7}
+.levelbar.hidden{display:none}
+.level-switch{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--soft);flex:1}
+.level-btn{flex:1;padding:8px 10px;border-radius:9px;background:transparent;color:var(--muted);font-size:.82rem;font-weight:720;border:0;cursor:pointer;transition:background 160ms ease,color 160ms ease,box-shadow 160ms ease}
+.level-btn[aria-selected=true]{color:var(--ink);background:var(--surface);box-shadow:0 1px 5px rgba(25,29,26,.09)}
+/* barra chiave */
+.keybar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:#fafaf7}
+.keybar label{font-size:.8rem;font-weight:760;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.keybar input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;outline:0}
+.keybar input:focus{outline:3px solid rgba(35,61,49,.16)}
+.keybar.hidden{display:none}
+/* pannelli */
+.panels{display:grid;grid-template-columns:1fr 1fr}
+.panel{min-width:0;padding:24px}.panel+.panel{border-left:1px solid var(--line)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:30px;margin-bottom:12px}
+.panel-label{font-size:.82rem;font-weight:780;letter-spacing:.08em;text-transform:uppercase}
+.status{color:var(--muted);font-size:.78rem;font-weight:650}.status[data-tone=error]{color:var(--danger)}
+textarea{display:block;width:100%;min-height:310px;resize:vertical;border:0;outline:0;padding:4px 0;color:var(--ink);background:transparent;font-size:clamp(1.08rem,2vw,1.35rem);line-height:1.65;letter-spacing:.01em}
+textarea::placeholder{color:#b0b2ac}
+.panel-actions{display:flex;align-items:center;justify-content:flex-end;min-height:46px;margin-top:16px}
+.translate-button,.copy-button{min-height:44px;padding:0 18px;border-radius:12px;font-size:.9rem;font-weight:750}
+.translate-button{color:#fff;background:var(--accent)}.translate-button:hover{background:var(--accent-hover)}
+.copy-button{border:1px solid var(--line);background:var(--surface)}.copy-button:hover{background:var(--soft)}
+.message{min-height:20px;margin:14px 4px 0;color:var(--danger);font-size:.84rem;line-height:1.45}
+.legacy-toggle{position:fixed;right:20px;bottom:20px;z-index:20;min-height:42px;padding:0 16px;border:1px solid rgba(23,24,22,.12);border-radius:999px;background:rgba(255,255,255,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(29,34,30,.12);font-size:.82rem;font-weight:760;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.legacy-toggle:hover{background:rgba(255,255,255,.78)}
+.legacy-panel{position:fixed;inset:20px;z-index:30;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.legacy-panel.hidden{display:none}
+.legacy-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:#fafaf7}
+.legacy-header span{font-size:.8rem;font-weight:780;letter-spacing:.08em;text-transform:uppercase}
+.legacy-close{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.legacy-frame{width:100%;height:100%;border:0;background:#fff}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid rgba(35,61,49,.22);outline-offset:2px}
+@media(max-width:760px){
+  .shell{width:min(100% - 24px,680px);padding:28px 0}
+  .masthead{align-items:center}
+  .identity span{display:none}
+  .toolbar{align-items:stretch}
+  .mode-switch{flex:1}
+  .mode-button{flex:1;padding-inline:8px}
+  .levelbar{flex-wrap:wrap}
+  .level-switch{order:2;width:100%}
+  .panels{grid-template-columns:1fr}
+  .panel+.panel{border-top:1px solid var(--line);border-left:0}
+  textarea{min-height:210px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
-  <main class="shell">
-    <header class="masthead">
-      <div class="identity">
-        <h1>cUX</h1>
-        <span>Traduttore</span>
-      </div>
-      <button class="clear-button" id="clearButton" type="button">Svuota</button>
-    </header>
-
-    <section class="translator" aria-label="Traduttore cUX">
-      <div class="toolbar">
-        <div class="mode-switch" role="tablist" aria-label="Direzione">
-          <button class="mode-button" id="encodeMode" type="button" role="tab" aria-selected="true">Italiano → cUX</button>
-          <button class="mode-button" id="decodeMode" type="button" role="tab" aria-selected="false">cUX → Italiano</button>
-        </div>
-        <button class="swap-button" id="swapButton" type="button" aria-label="Inverti direzione" title="Inverti direzione">⇄</button>
-      </div>
-
-      <div class="panels">
-        <section class="panel">
-          <div class="panel-head">
-            <label class="panel-label" id="sourceLabel" for="sourceText">Italiano</label>
-          </div>
-          <textarea id="sourceText" placeholder="Inserisci il testo" spellcheck="false" autocomplete="off" autocapitalize="off" data-gramm="false"></textarea>
-          <div class="panel-actions">
-            <button class="translate-button" id="translateButton" type="button">Traduci</button>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <label class="panel-label" id="targetLabel" for="targetText">cUX</label>
-            <span class="status" id="status" aria-live="polite"></span>
-          </div>
-          <textarea id="targetText" readonly spellcheck="false" aria-label="Risultato"></textarea>
-          <div class="panel-actions">
-            <button class="copy-button" id="copyButton" type="button">Copia</button>
-          </div>
-        </section>
-      </div>
+<main class="shell">
+<header class="masthead">
+  <div class="identity"><h1 id="mainTitle" tabindex="0" role="button" aria-controls="levelbar" aria-expanded="false" aria-label="Mostra i livelli disponibili">cUX</h1><span>Traduttore</span></div>
+  <button class="clear-button" id="clearButton" type="button">Svuota</button>
+</header>
+<section class="translator" aria-label="Traduttore cUX">
+  <!-- direzione -->
+  <div class="toolbar">
+    <div class="mode-switch" role="tablist" aria-label="Direzione">
+      <button class="mode-button" id="encodeMode" type="button" role="tab" aria-selected="true">Italiano → cUX</button>
+      <button class="mode-button" id="decodeMode" type="button" role="tab" aria-selected="false">cUX → Italiano</button>
+    </div>
+    <button class="swap-button" id="swapButton" type="button" aria-label="Inverti direzione" title="Inverti direzione">⇄</button>
+  </div>
+  <!-- selezione livello -->
+  <div class="levelbar hidden" id="levelbar">
+    <div class="level-switch" role="tablist" aria-label="Livello di cifratura">
+      <button class="level-btn" id="lvl1" type="button" role="tab" aria-selected="false">Livello 1</button>
+      <button class="level-btn" id="lvl2" type="button" role="tab" aria-selected="false">Livello 2</button>
+      <button class="level-btn" id="lvl3" type="button" role="tab" aria-selected="true">Livello 3</button>
+    </div>
+  </div>
+  <!-- chiave (solo livello 3) -->
+  <div class="keybar hidden" id="keybar">
+    <label for="keyText">Chiave</label>
+    <input id="keyText" value="" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Inserisci la chiave">
+  </div>
+  <!-- pannelli testo -->
+  <div class="panels">
+    <section class="panel">
+      <div class="panel-head"><label class="panel-label" id="sourceLabel" for="sourceText">Italiano</label></div>
+      <textarea id="sourceText" placeholder="Inserisci il testo" spellcheck="false" autocomplete="off" autocapitalize="off" data-gramm="false"></textarea>
+      <div class="panel-actions"><button class="translate-button" id="translateButton" type="button">Traduci</button></div>
     </section>
+    <section class="panel">
+      <div class="panel-head">
+        <label class="panel-label" id="targetLabel" for="targetText">cUX</label>
+        <span class="status" id="status" aria-live="polite"></span>
+      </div>
+      <textarea id="targetText" readonly spellcheck="false" aria-label="Risultato"></textarea>
+      <div class="panel-actions"><button class="copy-button" id="copyButton" type="button">Copia</button></div>
+    </section>
+  </div>
+</section>
+<p class="message" id="message" role="alert"></p>
+</main>
 
-    <p class="message" id="message" role="alert"></p>
-  </main>
-
-  <script>
-    "use strict";
-
-    const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const SINGLE_PREFIXES = new Set(["a", "t", "b", "c", "d", "e"]);
-    const VARIANT_PREFIXES = new Set(["nt", "nb"]);
-
-    function normalizeSequence(value) {
-      return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z ]/g, "");
-    }
-
-    function letterToNumber(letter) {
-      return ALPHABET.indexOf(letter) + 1;
-    }
-
-    function numberToLetter(number) {
-      return number >= 1 && number <= 26 ? ALPHABET[number - 1] : "";
-    }
-
-    function numberToSymbol(number) {
-      return number === 27 ? " " : numberToLetter(number);
-    }
-
-    function permuteBlock(raw) {
-      return raw[2] + raw[0] + raw[3] + raw[1];
-    }
-
-    function unpermuteBlock(permuted) {
-      return permuted[1] + permuted[3] + permuted[0] + permuted[2];
-    }
-
-    function typeFromLengths(lengths) {
-      const key = lengths.join("");
-      if (lengths.length >= 1 && lengths.length <= 4 && lengths.every(length => length === 1)) return "a";
-      if (key === "2") return "d";
-      if (key === "21") return "nt";
-      if (key === "211") return "t";
-      if (key === "12") return "nb";
-      if (key === "112") return "b";
-      if (key === "22") return "c";
-      if (key === "121") return "e";
-      return "";
-    }
-
-    function encodePermutedDigits(digits) {
-      const tokens = [];
-      let index = 0;
-
-      while (index < digits.length) {
-        const pairText = digits.slice(index, index + 2);
-        const pair = pairText.length === 2 ? Number(pairText) : 0;
-
-        if (digits[index] !== "0" && pair >= 10 && pair <= 26) {
-          tokens.push(numberToLetter(pair));
-          index += 2;
-          continue;
-        }
-
-        if (digits[index] === "0") {
-          let run = 1;
-          while (index + run < digits.length && digits[index + run] === "0") run += 1;
-          while (run >= 3) {
-            tokens.push("p2");
-            index += 3;
-            run -= 3;
-          }
-          if (run === 2) {
-            tokens.push("pi");
-            index += 2;
-          } else if (run === 1) {
-            tokens.push("p");
-            index += 1;
-          }
-          continue;
-        }
-
-        tokens.push(numberToLetter(Number(digits[index])));
-        index += 1;
-      }
-
-      return tokens.join("");
-    }
-
-    function makeBlock(content, parts) {
-      const type = typeFromLengths(parts.map(part => part.length));
-      if (!type) throw new Error("Combinazione non valida.");
-      const raw = content.padEnd(4, "0");
-      return type + encodePermutedDigits(permuteBlock(raw));
-    }
-
-    function encryptWord(input) {
-      const sequence = normalizeSequence(input);
-      if (!sequence) return "";
-      const blocks = [];
-      let content = "";
-      let parts = [];
-
-      function finish() {
-        if (!content) return;
-        blocks.push(makeBlock(content, parts));
-        content = "";
-        parts = [];
-      }
-
-      for (const symbol of sequence) {
-        const code = symbol === " " ? "27" : String(letterToNumber(symbol));
-        if (content.length + code.length > 4) finish();
-        content += code;
-        parts.push(code);
-        if (content.length === 4) finish();
-      }
-
-      finish();
-      return blocks.join("");
-    }
-
-    function encryptText(text) {
-      return text.replace(/[A-Za-zÀ-ÖØ-öø-ÿ ]+/g, encryptWord);
-    }
-
-    function decodePayload(payload) {
-      let digits = "";
-      let index = 0;
-
-      while (index < payload.length) {
-        const character = payload[index];
-        if (/[A-Z]/.test(character)) {
-          digits += String(letterToNumber(character));
-          index += 1;
-        } else if (character === "p") {
-          if (payload[index + 1] === "2") {
-            digits += "000";
-            index += 2;
-          } else if (payload[index + 1] === "i") {
-            digits += "00";
-            index += 2;
-          } else {
-            digits += "0";
-            index += 1;
-          }
-        } else {
-          throw new Error("Il testo non è valido.");
-        }
-      }
-
-      if (digits.length !== 4) throw new Error("Il testo non è valido.");
-      return digits;
-    }
-
-    function prefixAt(value, index) {
-      const variant = value.slice(index, index + 2);
-      if (VARIANT_PREFIXES.has(variant)) return variant;
-      return SINGLE_PREFIXES.has(value[index]) ? value[index] : "";
-    }
-
-    function parseChunks(cipherWord) {
-      const chunks = [];
-      let index = 0;
-
-      while (index < cipherWord.length) {
-        const prefix = prefixAt(cipherWord, index);
-        if (!prefix) throw new Error("Il testo non è valido.");
-        index += prefix.length;
-        const start = index;
-
-        while (index < cipherWord.length && !prefixAt(cipherWord, index)) {
-          if (/[A-Z]/.test(cipherWord[index])) {
-            index += 1;
-          } else if (cipherWord[index] === "p") {
-            if (cipherWord[index + 1] === "2" || cipherWord[index + 1] === "i") index += 2;
-            else index += 1;
-          } else {
-            throw new Error("Il testo non è valido.");
-          }
-        }
-
-        const payload = cipherWord.slice(start, index);
-        if (!payload) throw new Error("Il testo non è valido.");
-        chunks.push({ prefix, raw: unpermuteBlock(decodePayload(payload)) });
-      }
-
-      return chunks;
-    }
-
-    function layoutForChunk(chunk) {
-      if (chunk.prefix === "a") {
-        let length = 4;
-        while (length > 0 && chunk.raw[length - 1] === "0") length -= 1;
-        if (length < 1 || !/^[1-9]+$/.test(chunk.raw.slice(0, length))) throw new Error("Il testo non è valido.");
-        return Array(length).fill(1);
-      }
-      if (chunk.prefix === "d") return [2];
-      if (chunk.prefix === "nt") return [2, 1];
-      if (chunk.prefix === "t") return [2, 1, 1];
-      if (chunk.prefix === "nb") return [1, 2];
-      if (chunk.prefix === "b") return [1, 1, 2];
-      if (chunk.prefix === "c") return [2, 2];
-      if (chunk.prefix === "e") return [1, 2, 1];
-      throw new Error("Il testo non è valido.");
-    }
-
-    function decodeChunk(chunk) {
-      const layout = layoutForChunk(chunk);
-      const contentLength = layout.reduce((total, length) => total + length, 0);
-      if (chunk.raw.slice(contentLength) !== "0".repeat(4 - contentLength)) throw new Error("Il testo non è valido.");
-
-      let output = "";
-      let index = 0;
-      for (const length of layout) {
-        const digits = chunk.raw.slice(index, index + length);
-        const value = Number(digits);
-        if (length === 1 && (value < 1 || value > 9)) throw new Error("Il testo non è valido.");
-        if (length === 2 && (value < 10 || value > 27)) throw new Error("Il testo non è valido.");
-        output += numberToSymbol(value);
-        index += length;
-      }
-      return output;
-    }
-
-    function decryptWord(cipherWord) {
-      return parseChunks(cipherWord).map(decodeChunk).join("");
-    }
-
-    function decryptText(text) {
-      const tokenPattern = /(?:(?:nb|nt|[atbcde])(?:[A-Z]|p(?:i|2)?)+)+/g;
-      let output = "";
-      let cursor = 0;
-      let match;
-
-      while ((match = tokenPattern.exec(text)) !== null) {
-        output += text.slice(cursor, match.index);
-        output += decryptWord(match[0]);
-        cursor = match.index + match[0].length;
-      }
-
-      output += text.slice(cursor);
-      return output;
-    }
-
-    function init() {
-      const source = document.getElementById("sourceText");
-      const target = document.getElementById("targetText");
-      const sourceLabel = document.getElementById("sourceLabel");
-      const targetLabel = document.getElementById("targetLabel");
-      const encodeMode = document.getElementById("encodeMode");
-      const decodeMode = document.getElementById("decodeMode");
-      const status = document.getElementById("status");
-      const message = document.getElementById("message");
-      let direction = "encode";
-
-      function setDirection(next, swap = false) {
-        if (swap) {
-          const oldSource = source.value;
-          source.value = target.value;
-          target.value = oldSource;
-        }
-        direction = next;
-        const encoding = direction === "encode";
-        encodeMode.setAttribute("aria-selected", String(encoding));
-        decodeMode.setAttribute("aria-selected", String(!encoding));
-        sourceLabel.textContent = encoding ? "Italiano" : "cUX";
-        targetLabel.textContent = encoding ? "cUX" : "Italiano";
-        source.placeholder = encoding ? "Inserisci il testo" : "Inserisci il testo cUX";
-        status.textContent = "";
-        status.dataset.tone = "";
-        message.textContent = "";
-      }
-
-      function translate() {
-        message.textContent = "";
-        status.textContent = "";
-        status.dataset.tone = "";
-        if (!source.value) {
-          target.value = "";
-          return;
-        }
-        try {
-          target.value = direction === "encode" ? encryptText(source.value) : decryptText(source.value);
-          status.textContent = "Fatto";
-        } catch (error) {
-          target.value = "";
-          status.textContent = "Errore";
-          status.dataset.tone = "error";
-          message.textContent = error instanceof Error ? error.message : String(error);
-        }
-      }
-
-      encodeMode.addEventListener("click", () => setDirection("encode"));
-      decodeMode.addEventListener("click", () => setDirection("decode"));
-      document.getElementById("translateButton").addEventListener("click", translate);
-      document.getElementById("swapButton").addEventListener("click", () => setDirection(direction === "encode" ? "decode" : "encode", true));
-      document.getElementById("clearButton").addEventListener("click", () => {
-        source.value = "";
-        target.value = "";
-        status.textContent = "";
-        message.textContent = "";
-        source.focus();
-      });
-      document.getElementById("copyButton").addEventListener("click", async () => {
-        if (!target.value) return;
-        try {
-          if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(target.value);
-          else {
-            target.focus();
-            target.select();
-            document.execCommand("copy");
-            source.focus();
-          }
-          status.textContent = "Copiato";
-        } catch (_) {
-          message.textContent = "Seleziona il risultato e copialo manualmente.";
-        }
-      });
-      source.addEventListener("keydown", event => {
-        if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-          event.preventDefault();
-          translate();
-        }
-      });
-
-      source.focus();
-    }
-
-    if (typeof module !== "undefined" && module.exports) {
-      module.exports = { encryptWord, encryptText, decryptWord, decryptText };
-    }
-
-    if (typeof document !== "undefined") init();
-  </script>
+<button class="legacy-toggle" id="legacyToggle" type="button" aria-expanded="false" aria-controls="legacyPanel">versione precedente</button>
+<div class="legacy-panel hidden" id="legacyPanel" aria-label="versione precedente del traduttore">
+  <div class="legacy-header">
+    <span>Versione precedente</span>
+    <button class="legacy-close" id="legacyClose" type="button">Chiudi</button>
+  </div>
+  <iframe class="legacy-frame" id="legacyFrame" title="versione precedente cUX" src="oldindex.html"></iframe>
+</div>
+<script> 
+  const _0x4a53b1=_0x5839;(function(_0x54a9c9,_0x696d){const _0x1d50f1=_0x5839,_0x11c68a=_0x54a9c9();while(!![]){try{const _0x5c668c=-parseInt(_0x1d50f1(0x1b5))/0x1*(-parseInt(_0x1d50f1(0x1f2))/0x2)+-parseInt(_0x1d50f1(0x187))/0x3+-parseInt(_0x1d50f1(0x191))/0x4+parseInt(_0x1d50f1(0x1c3))/0x5*(-parseInt(_0x1d50f1(0x1cd))/0x6)+parseInt(_0x1d50f1(0x1cc))/0x7*(parseInt(_0x1d50f1(0x189))/0x8)+-parseInt(_0x1d50f1(0x18d))/0x9*(parseInt(_0x1d50f1(0x1b9))/0xa)+parseInt(_0x1d50f1(0x19a))/0xb*(parseInt(_0x1d50f1(0x1ff))/0xc);if(_0x5c668c===_0x696d)break;else _0x11c68a['push'](_0x11c68a['shift']());}catch(_0x57ba1c){_0x11c68a['push'](_0x11c68a['shift']());}}}(_0x2a0c,0xd0751));const _0x5443da=(function(){let _0x5e4e4f=!![];return function(_0x1d81f2,_0x7e6cbb){const _0x5995ad=_0x5e4e4f?function(){if(_0x7e6cbb){const _0x938284=_0x7e6cbb['apply'](_0x1d81f2,arguments);return _0x7e6cbb=null,_0x938284;}}:function(){};return _0x5e4e4f=![],_0x5995ad;};}()),_0x20a90f=_0x5443da(this,function(){const _0x4ae065=_0x5839;if(_0x20a90f[_0x4ae065(0x1ec)]()[_0x4ae065(0x17b)]()['indexOf']('\x0a')!==-0x1)return;return _0x20a90f[_0x4ae065(0x17b)]()[_0x4ae065(0x197)](_0x4ae065(0x184))[_0x4ae065(0x17b)]()[_0x4ae065(0x1c9)](_0x20a90f)[_0x4ae065(0x197)](_0x4ae065(0x184));});_0x20a90f();const _0x20ba5e=(function(){let _0x3185cd=!![];return function(_0x1a1aaf,_0x22c4e1){const _0x52d259=_0x3185cd?function(){const _0x3b0235=_0x5839;if(_0x22c4e1){const _0x438b7f=_0x22c4e1[_0x3b0235(0x1ef)](_0x1a1aaf,arguments);return _0x22c4e1=null,_0x438b7f;}}:function(){};return _0x3185cd=![],_0x52d259;};}());(function(){_0x20ba5e(this,function(){const _0x22f5c3=_0x5839,_0x19fefc=new RegExp(_0x22f5c3(0x1f1)),_0x3d8e56=new RegExp(_0x22f5c3(0x18a),'i'),_0x5912e9=_0x58123e('init');!_0x19fefc[_0x22f5c3(0x200)](_0x5912e9+_0x22f5c3(0x198))||!_0x3d8e56['test'](_0x5912e9+'input')?_0x5912e9('0'):_0x58123e();})();}());const _0x1f5588=(function(){let _0x122e59=!![];return function(_0x583697,_0x4a8b37){const _0x2fd71b=_0x122e59?function(){const _0x3f6d20=_0x5839;if(_0x4a8b37){const _0xe32e9e=_0x4a8b37[_0x3f6d20(0x1ef)](_0x583697,arguments);return _0x4a8b37=null,_0xe32e9e;}}:function(){};return _0x122e59=![],_0x2fd71b;};}()),_0x4dc3e4=_0x1f5588(this,function(){const _0x1e024f=_0x5839;let _0xa69c85;try{const _0x43240c=Function(_0x1e024f(0x1eb)+'{}.constructor(\x22return\x20this\x22)(\x20)'+');');_0xa69c85=_0x43240c();}catch(_0x111b0c){_0xa69c85=window;}const _0x43fe80=_0xa69c85['console']=_0xa69c85[_0x1e024f(0x1df)]||{},_0x1b67ef=['log',_0x1e024f(0x19e),_0x1e024f(0x19d),'error',_0x1e024f(0x188),_0x1e024f(0x178),'trace'];for(let _0x376f23=0x0;_0x376f23<_0x1b67ef['length'];_0x376f23++){const _0x48c13b=_0x1f5588[_0x1e024f(0x1c9)][_0x1e024f(0x203)]['bind'](_0x1f5588),_0x165ca3=_0x1b67ef[_0x376f23],_0x250e0d=_0x43fe80[_0x165ca3]||_0x48c13b;_0x48c13b[_0x1e024f(0x1ad)]=_0x1f5588[_0x1e024f(0x1ec)](_0x1f5588),_0x48c13b[_0x1e024f(0x17b)]=_0x250e0d['toString']['bind'](_0x250e0d),_0x43fe80[_0x165ca3]=_0x48c13b;}});_0x4dc3e4();'use strict';const _0x37630f='ABCDEFGHIJKLMNOPQRSTUVWXYZ',_0x480067=new Set(['a','b','c','d','e','f']),_0x395bd8=new Set(['bb','cc']);function _0xc3540a(_0x4f9e6f){const _0xdc4677=_0x5839,_0x4680dc=_0x4f9e6f[_0xdc4677(0x1f3)](_0xdc4677(0x1ba)),_0x145566=_0x4680dc[0x0],_0x4db84a=_0x4680dc[_0xdc4677(0x1b8)](0x1),_0x49bc9e=_0x145566[_0xdc4677(0x185)](),_0x546ad7=_0x37630f[_0xdc4677(0x1c8)](_0x49bc9e);if(_0x546ad7!==-0x1)return[String(_0x546ad7+0x1),..._0x4db84a?['30']:[]];if(_0x145566==='\x20')return['27'];if(_0x145566==='.')return['28'];if(_0x145566===',')return['29'];if(_0x145566==='?')return['31'];if(_0x145566==='!')return['32'];if(_0x145566==='\x27')return['33'];return['34'];}function _0x5c5797(_0x4b0e2a){return _0x4b0e2a>=0x1&&_0x4b0e2a<=0x1a?_0x37630f[_0x4b0e2a-0x1]:'';}function _0xecb5be(_0xd397d5){return _0xd397d5[0x2]+_0xd397d5[0x0]+_0xd397d5[0x3]+_0xd397d5[0x1];}function _0x4abfb6(_0x39acad){return _0x39acad[0x1]+_0x39acad[0x3]+_0x39acad[0x0]+_0x39acad[0x2];}function _0x466e8b(_0x44cc10){const _0x4f9073=_0x5839,_0x2c20eb=_0x44cc10[_0x4f9073(0x1d1)]('');if(_0x44cc10[_0x4f9073(0x1d0)]>=0x1&&_0x44cc10['length']<=0x4&&_0x44cc10[_0x4f9073(0x1bc)](_0x100fb9=>_0x100fb9===0x1))return'a';if(_0x2c20eb==='2')return'd';if(_0x2c20eb==='21')return'bb';if(_0x2c20eb===_0x4f9073(0x1e1))return'f';if(_0x2c20eb==='12')return'cc';if(_0x2c20eb===_0x4f9073(0x1cb))return'b';if(_0x2c20eb==='22')return'c';if(_0x2c20eb===_0x4f9073(0x18f))return'e';throw new Error(_0x4f9073(0x1c6));}function _0x247be9(_0x7ef663){const _0x30454a=_0x5839,_0x210bfb=[];let _0x44a8bb=0x0;while(_0x44a8bb<_0x7ef663[_0x30454a(0x1d0)]){const _0x14cdd7=_0x7ef663[_0x30454a(0x1d0)]-_0x44a8bb>=0x2?Number(_0x7ef663['slice'](_0x44a8bb,_0x44a8bb+0x2)):NaN;if(_0x7ef663[_0x44a8bb]!=='0'&&_0x14cdd7>=0xa&&_0x14cdd7<=0x1a){_0x210bfb[_0x30454a(0x1c5)](_0x5c5797(_0x14cdd7)),_0x44a8bb+=0x2;continue;}if(_0x7ef663[_0x44a8bb]==='0'){let _0x32f4ff=0x1;while(_0x44a8bb+_0x32f4ff<_0x7ef663['length']&&_0x7ef663[_0x44a8bb+_0x32f4ff]==='0')_0x32f4ff++;while(_0x32f4ff>=0x3){_0x210bfb[_0x30454a(0x1c5)]('p2'),_0x44a8bb+=0x3,_0x32f4ff-=0x3;}if(_0x32f4ff===0x2)_0x210bfb[_0x30454a(0x1c5)]('pi'),_0x44a8bb+=0x2;else _0x32f4ff===0x1&&(_0x210bfb['push']('p'),_0x44a8bb++);continue;}_0x210bfb['push'](_0x5c5797(Number(_0x7ef663[_0x44a8bb]))),_0x44a8bb++;}return _0x210bfb['join']('');}function _0xe51218(_0x12f95f,_0x5453f2){const _0x3cb0d1=_0x5839,_0x30a768=_0x466e8b(_0x5453f2[_0x3cb0d1(0x183)](_0x25ba6d=>_0x25ba6d[_0x3cb0d1(0x1d0)]));return _0x30a768+_0x247be9(_0xecb5be(_0x12f95f[_0x3cb0d1(0x1e4)](0x4,'0')));}function _0x42c172(_0x3cfa73){const _0x2c2c7=_0x5839,_0x2706ea=[];let _0x428226='',_0x236495=[];function _0x1943d1(){const _0x424db5=_0x5839;if(!_0x428226)return;_0x2706ea[_0x424db5(0x1c5)](_0xe51218(_0x428226,_0x236495)),_0x428226='',_0x236495=[];}for(const _0x123aaa of _0x3cfa73){for(const _0x488d45 of _0xc3540a(_0x123aaa)){if(_0x428226[_0x2c2c7(0x1d0)]+_0x488d45['length']>0x4)_0x1943d1();_0x428226+=_0x488d45,_0x236495['push'](_0x488d45);if(_0x428226[_0x2c2c7(0x1d0)]===0x4)_0x1943d1();}}return _0x1943d1(),_0x2706ea['join']('');}function _0x4bb244(_0x58939f){const _0x3bb1ed=_0x5839;let _0x149e92='',_0x2c7833=0x0;while(_0x2c7833<_0x58939f[_0x3bb1ed(0x1d0)]){const _0x1e7c13=_0x58939f[_0x2c7833];if(/[A-Z]/[_0x3bb1ed(0x200)](_0x1e7c13)){_0x149e92+=String(_0x37630f[_0x3bb1ed(0x1c8)](_0x1e7c13)+0x1),_0x2c7833++;continue;}if(_0x1e7c13==='p'){if(_0x58939f[_0x2c7833+0x1]==='2')_0x149e92+=_0x3bb1ed(0x1e2),_0x2c7833+=0x2;else _0x58939f[_0x2c7833+0x1]==='i'?(_0x149e92+='00',_0x2c7833+=0x2):(_0x149e92+='0',_0x2c7833++);continue;}throw new Error(_0x3bb1ed(0x1a1));}if(_0x149e92[_0x3bb1ed(0x1d0)]!==0x4)throw new Error(_0x3bb1ed(0x1f4));return _0x149e92;}function _0x13e327(_0x32be1b,_0x101a80){const _0x53f278=_0x5839,_0x22e706=_0x32be1b[_0x53f278(0x1b8)](_0x101a80,_0x101a80+0x2);if(_0x395bd8[_0x53f278(0x1d4)](_0x22e706))return _0x22e706;return _0x480067[_0x53f278(0x1d4)](_0x32be1b[_0x101a80])?_0x32be1b[_0x101a80]:'';}function _0x5839(_0xe52d50,_0x4cdc3b){_0xe52d50=_0xe52d50-0x178;const _0x4798ba=_0x2a0c();let _0x2ed2ee=_0x4798ba[_0xe52d50];return _0x2ed2ee;}function _0x455234(_0x47ad5d){const _0x1de327=_0x5839,_0x4512e0=[];let _0x4852a8=0x0;while(_0x4852a8<_0x47ad5d[_0x1de327(0x1d0)]){const _0x19a9bc=_0x13e327(_0x47ad5d,_0x4852a8);if(!_0x19a9bc)throw new Error(_0x1de327(0x1d7));_0x4852a8+=_0x19a9bc[_0x1de327(0x1d0)];const _0x46266a=_0x4852a8;while(_0x4852a8<_0x47ad5d['length']&&!_0x13e327(_0x47ad5d,_0x4852a8)){if(/[A-Z]/[_0x1de327(0x200)](_0x47ad5d[_0x4852a8]))_0x4852a8++;else{if(_0x47ad5d[_0x4852a8]==='p')_0x4852a8+=_0x47ad5d[_0x4852a8+0x1]==='2'||_0x47ad5d[_0x4852a8+0x1]==='i'?0x2:0x1;else throw new Error(_0x1de327(0x1bb));}}if(_0x46266a===_0x4852a8)throw new Error(_0x1de327(0x1aa));_0x4512e0['push']({'prefix':_0x19a9bc,'raw':_0x4abfb6(_0x4bb244(_0x47ad5d[_0x1de327(0x1b8)](_0x46266a,_0x4852a8)))});}return _0x4512e0;}function _0x46cab8(_0x2a53fb){return{'a':[0x1],'b':[0x1,0x1,0x2],'c':[0x2,0x2],'d':[0x2],'e':[0x1,0x2,0x1],'f':[0x2,0x1,0x1],'bb':[0x2,0x1],'cc':[0x1,0x2]}[_0x2a53fb]||null;}function _0x4c2ded(_0x30ac6d){const _0x3ada98=_0x5839;let _0x33f34c=_0x46cab8(_0x30ac6d['prefix']);if(!_0x33f34c)throw new Error(_0x3ada98(0x1d7));if(_0x30ac6d[_0x3ada98(0x1d5)]==='a'){let _0x3fe6a2=0x4;while(_0x3fe6a2>0x0&&_0x30ac6d['raw'][_0x3fe6a2-0x1]==='0')_0x3fe6a2--;if(_0x3fe6a2<0x1)throw new Error(_0x3ada98(0x1ce));_0x33f34c=Array(_0x3fe6a2)[_0x3ada98(0x1fa)](0x1);}const _0x43ef02=_0x33f34c[_0x3ada98(0x1e5)]((_0x34448f,_0x23bf15)=>_0x34448f+_0x23bf15,0x0);if(_0x30ac6d[_0x3ada98(0x17e)]['slice'](_0x43ef02)!=='0'['repeat'](0x4-_0x43ef02))throw new Error(_0x3ada98(0x1ac));let _0x49999b='',_0x44ca15=0x0;for(const _0x55444f of _0x33f34c){const _0x157f4b=Number(_0x30ac6d[_0x3ada98(0x17e)]['slice'](_0x44ca15,_0x44ca15+_0x55444f));if(_0x55444f===0x1&&!(_0x157f4b>=0x1&&_0x157f4b<=0x9))throw new Error('Codice\x20non\x20valido.');if(_0x55444f===0x2&&!(_0x157f4b>=0xa&&_0x157f4b<=0x22))throw new Error('Codice\x20non\x20valido.');_0x49999b+=String(_0x157f4b)+',',_0x44ca15+=_0x55444f;}return _0x49999b['slice'](0x0,-0x1);}function _0x56640c(_0x446ca4){const _0x2009cb=_0x5839,_0x55b76c=_0x446ca4[_0x2009cb(0x1fb)]('|')[_0x2009cb(0x201)](Boolean);let _0x58ded8='';for(const _0x22f960 of _0x55b76c){const _0x59b4d5=_0x22f960[_0x2009cb(0x1fb)](',')[_0x2009cb(0x183)](Number);for(let _0x436112=0x0;_0x436112<_0x59b4d5[_0x2009cb(0x1d0)];_0x436112++){const _0x5382b1=_0x59b4d5[_0x436112];if(_0x5382b1>=0x1&&_0x5382b1<=0x1a){let _0x5b0339=_0x37630f[_0x5382b1-0x1];_0x59b4d5[_0x436112+0x1]===0x1e&&(_0x5b0339={'A':'À','E':'È','I':'Ì','O':'Ò','U':'Ù'}[_0x5b0339]||_0x5b0339,_0x436112++),_0x58ded8+=_0x5b0339;}else{if(_0x5382b1===0x1b)_0x58ded8+='\x20';else{if(_0x5382b1===0x1c)_0x58ded8+='.';else{if(_0x5382b1===0x1d)_0x58ded8+=',';else{if(_0x5382b1===0x1f)_0x58ded8+='?';else{if(_0x5382b1===0x20)_0x58ded8+='!';else{if(_0x5382b1===0x21)_0x58ded8+='\x27';else{if(_0x5382b1===0x22)_0x58ded8+='$';else{if(_0x5382b1===0x1e)_0x58ded8+='\u0300';else throw new Error(_0x2009cb(0x19c));}}}}}}}}}}return _0x58ded8['normalize'](_0x2009cb(0x1db));}function _0x1f0f9c(_0x512208){return _0x56640c(_0x455234(_0x512208)['map'](_0x4c2ded)['join']('|'));}const _0x26ccba={'a':'J','b':'K','c':'L','d':'M','e':'N','f':'O','bb':'KK','cc':'LL'};function _0x33c8c1(_0xf6dd66){return _0xf6dd66==='0'?'P':_0x37630f[Number(_0xf6dd66)-0x1];}function _0x2debe2(_0x579def){const _0x2780e3=_0x5839;let _0x504a3e='',_0xae64e2=0x0;while(_0xae64e2<_0x579def['length']){if(_0x579def[_0xae64e2]==='p'){if(_0x579def[_0xae64e2+0x1]==='2')_0x504a3e+=_0x2780e3(0x1c0),_0xae64e2+=0x2;else _0x579def[_0xae64e2+0x1]==='i'?(_0x504a3e+='PP',_0xae64e2+=0x2):(_0x504a3e+='P',_0xae64e2++);}else{const _0x3e70cd=_0x37630f[_0x2780e3(0x1c8)](_0x579def[_0xae64e2])+0x1;if(_0x3e70cd<0x1)throw new Error(_0x2780e3(0x181));for(const _0x434900 of String(_0x3e70cd))_0x504a3e+=_0x33c8c1(_0x434900);_0xae64e2++;}}return _0x504a3e;}function _0x1b993f(_0x5b22a9){const _0x8590f6=_0x5839,_0x4cd80a=_0x42c172(_0x5b22a9),_0x17e47b=[];let _0x5d932a=0x0;while(_0x5d932a<_0x4cd80a['length']){const _0x51ddca=_0x13e327(_0x4cd80a,_0x5d932a);if(!_0x51ddca)throw new Error(_0x8590f6(0x199));_0x5d932a+=_0x51ddca[_0x8590f6(0x1d0)];const _0x2cc244=_0x5d932a;while(_0x5d932a<_0x4cd80a[_0x8590f6(0x1d0)]&&!_0x13e327(_0x4cd80a,_0x5d932a))_0x5d932a++;const _0x3c27d8=_0x4cd80a['slice'](_0x2cc244,_0x5d932a);if(!_0x3c27d8)throw new Error(_0x8590f6(0x199));_0x17e47b[_0x8590f6(0x1c5)](_0x26ccba[_0x51ddca]+_0x2debe2(_0x3c27d8));}return _0x17e47b[_0x8590f6(0x1d1)]('');}function _0x51cf7f(_0x3cd466){const _0x39b7f2=_0x5839;let _0x298bb5='';for(const _0x1c7ea8 of _0x3cd466){if(_0x1c7ea8==='P')_0x298bb5+='0';else{if(/[A-I]/[_0x39b7f2(0x200)](_0x1c7ea8))_0x298bb5+=String(_0x37630f['indexOf'](_0x1c7ea8)+0x1);else throw new Error('Blocco\x20di\x20secondo\x20livello\x20non\x20valido.');}}const _0x21dfff=[];let _0x482c1f=0x0;while(_0x482c1f<_0x298bb5[_0x39b7f2(0x1d0)]){if(_0x298bb5[_0x482c1f]==='0'){let _0x45b43b=0x1;while(_0x482c1f+_0x45b43b<_0x298bb5[_0x39b7f2(0x1d0)]&&_0x298bb5[_0x482c1f+_0x45b43b]==='0')_0x45b43b++;let _0x113dde=_0x45b43b;while(_0x113dde>=0x3){_0x21dfff[_0x39b7f2(0x1c5)]('p2'),_0x113dde-=0x3;}if(_0x113dde===0x2)_0x21dfff[_0x39b7f2(0x1c5)]('pi');else{if(_0x113dde===0x1)_0x21dfff[_0x39b7f2(0x1c5)]('p');}_0x482c1f+=_0x45b43b;continue;}const _0x1cbc27=_0x298bb5[_0x39b7f2(0x1d0)]-_0x482c1f>=0x2?Number(_0x298bb5[_0x39b7f2(0x1b8)](_0x482c1f,_0x482c1f+0x2)):NaN;_0x1cbc27>=0xa&&_0x1cbc27<=0x1a?(_0x21dfff[_0x39b7f2(0x1c5)](_0x5c5797(_0x1cbc27)),_0x482c1f+=0x2):(_0x21dfff['push'](_0x5c5797(Number(_0x298bb5[_0x482c1f]))),_0x482c1f++);}return _0x21dfff[_0x39b7f2(0x1d1)]('');}function _0x2a0c(){const _0x13be28=['function\x20*\x5c(\x20*\x5c)','2898572MWbbKg','normalize','Blocco\x20di\x20testo\x20non\x20valido.','padStart','debu','legacyPanel','string','decodeMode','fill','split','setAttribute','onkeydown','Inserisci\x20il\x20testo\x20in\x20chiaro','7508820pLXbRH','test','filter','encode','prototype','call','table','value','classList','toString','4c34f53515134831c04942578f5b29fe2b8c469b7fce2ff7373351020832ba4a','from','raw','set','writeText','Blocco\x20di\x20secondo\x20livello\x20non\x20valido.','focus','map','(((.+)+)+)+$','toUpperCase','legacyToggle','3580998xtYGJF','exception','5127384gKcEKK','\x5c+\x5c+\x20*(?:[a-zA-Z_$][0-9a-zA-Z_$]*)','targetLabel','tone','4068mdStqj','Errore','121','decode','108308DFZmOX','stateObject','action','onclick','counter','startsWith','search','chain','Primo\x20livello\x20non\x20valido.','55tVoeUJ','isSecureContext','Codice\x20numerico\x20non\x20valido.','info','warn','while\x20(true)\x20{}','hidden','Payload\x20non\x20valido.','message','Enter','error','Inserisci\x20una\x20chiave.','levelbar','sourceText','select','fromCharCode','Blocco\x20di\x20testo\x20vuoto.','subtle','Non\x20valido.','__proto__','getElementById','Fatto','Inserisci\x20il\x20testo\x20in\x20cUX','lvl2','mainTitle','aria-expanded','trim','1CiLrQQ','translateButton','lvl3','slice','36470PxuUJu','NFD','Errore\x20di\x20validità,\x20riprova','every','get','copyButton','add','PPP','sourceLabel','encodeMode','3739640AjeRja','dataset','push','Combinazione\x20non\x20valida','clipboard','indexOf','constructor','copy','112','7CtzHpS','12BlTLgU','Codice\x20non\x20valido.','contains','length','join','execCommand','metaKey','has','prefix','key','Prefisso\x20non\x20valido.','src','gger','undefined','NFC','Copiato','status','preventDefault','console','cUX','211','000','aria-selected','padEnd','reduce','Il\x20testo\x20non\x20è\x20valido.','SHA-256','ctrlKey','textContent','swapButton','return\x20(function()\x20','bind','Inserisci\x20la\x20password\x20per\x20sbloccare\x20i\x20livelli:','forEach','apply','keyText'];_0x2a0c=function(){return _0x13be28;};return _0x2a0c();}const _0x5324ad=[['KK','bb'],['LL','cc'],['J','a'],['K','b'],['L','c'],['M','d'],['N','e'],['O','f']];function _0x12b873(_0x6c053f){const _0x3f6e69=_0x5839,_0x33ba72=new Map();function _0x4f7873(_0x4b8a3d,_0x37b14d){try{const _0x5b4d28=_0x51cf7f(_0x37b14d),_0x116555=_0x4abfb6(_0x4bb244(_0x5b4d28));return _0x4c2ded({'prefix':_0x4b8a3d,'raw':_0x116555}),!![];}catch(_0x436814){return![];}}function _0x153090(_0x4416b6){const _0x253901=_0x5839;if(_0x4416b6===_0x6c053f['length'])return'';if(_0x33ba72[_0x253901(0x1d4)](_0x4416b6))return _0x33ba72[_0x253901(0x1bd)](_0x4416b6);for(const [_0x234946,_0x99ccab]of _0x5324ad){if(!_0x6c053f[_0x253901(0x196)](_0x234946,_0x4416b6))continue;const _0x4d1be6=_0x4416b6+_0x234946[_0x253901(0x1d0)];for(let _0x2cb603=_0x4d1be6+0x1;_0x2cb603<=Math['min'](_0x6c053f['length'],_0x4d1be6+0x20);_0x2cb603++){const _0x41cc2f=_0x6c053f[_0x253901(0x1b8)](_0x4d1be6,_0x2cb603);if(!_0x4f7873(_0x99ccab,_0x41cc2f))continue;const _0x573dae=_0x153090(_0x2cb603);if(_0x573dae!==null){const _0x4e7c7c=_0x99ccab+_0x51cf7f(_0x41cc2f)+_0x573dae;return _0x33ba72[_0x253901(0x17f)](_0x4416b6,_0x4e7c7c),_0x4e7c7c;}}}return _0x33ba72[_0x253901(0x17f)](_0x4416b6,null),null;}const _0x17598b=_0x153090(0x0);if(_0x17598b===null)throw new Error(_0x3f6e69(0x1e6));return _0x17598b;}function _0xb083b9(_0x3563c3){return _0x1f0f9c(_0x12b873(_0x3563c3));}function _0x2e0041(_0x41acc5){const _0x3df666=_0x5839;let _0x245d26='';for(const _0xb4d29f of _0x41acc5)_0x245d26+=_0xc3540a(_0xb4d29f)['join']('');return[..._0x245d26][_0x3df666(0x183)](Number);}function _0x4be51f(_0x37df17,_0xc84c5,_0x560877=![]){const _0x166f87=_0x5839,_0x12b664=_0x2e0041(_0xc84c5);if(!_0x12b664[_0x166f87(0x1d0)])throw new Error(_0x166f87(0x1a5));let _0x519908='';for(let _0xf62a20=0x0;_0xf62a20<_0x37df17[_0x166f87(0x1d0)];_0xf62a20++){const _0x332651=_0x12b664[_0xf62a20%_0x12b664[_0x166f87(0x1d0)]],_0x48a581=_0x37df17['charCodeAt'](_0xf62a20)-0x41,_0x5d84d3=_0x560877?((_0x48a581-_0x332651)%0x1a+0x1a)%0x1a:(_0x48a581+_0x332651)%0x1a;_0x519908+=String[_0x166f87(0x1a9)](0x41+_0x5d84d3);}return _0x519908;}function _0x175257(_0x2970c5,_0x5c6520){return _0x4be51f(_0x1b993f(_0x2970c5),_0x5c6520,![]);}function _0x5c74c(_0x52f61f,_0x55f8dd){const _0x4b3aad=_0x5839;if(!_0x55f8dd||!_0x55f8dd[_0x4b3aad(0x1b4)]())throw new Error(_0x4b3aad(0x1a5));const _0x4bab0d=_0x4be51f(_0x52f61f,_0x55f8dd,!![]);try{return _0xb083b9(_0x4bab0d);}catch(_0x14198e){return _0x4bab0d;}}function _0x1868fc(){const _0x3913c0=_0x5839,_0x1d4fcf=document[_0x3913c0(0x1ae)](_0x3913c0(0x1a7)),_0x562357=document[_0x3913c0(0x1ae)]('targetText'),_0x1a4981=document['getElementById'](_0x3913c0(0x1c1)),_0x53bd1e=document[_0x3913c0(0x1ae)](_0x3913c0(0x18b)),_0x1806b7=document['getElementById'](_0x3913c0(0x1c2)),_0x3077f5=document['getElementById'](_0x3913c0(0x1f9)),_0x25d524=document[_0x3913c0(0x1ae)](_0x3913c0(0x1dd)),_0x22b5e6=document[_0x3913c0(0x1ae)](_0x3913c0(0x1a2)),_0x155640=document['getElementById']('keybar'),_0x50e5b6=document[_0x3913c0(0x1ae)](_0x3913c0(0x1f0)),_0x4a5153=document[_0x3913c0(0x1ae)](_0x3913c0(0x1b2)),_0x19a93a=document[_0x3913c0(0x1ae)](_0x3913c0(0x1a6)),_0x6f0ee5=[document[_0x3913c0(0x1ae)]('lvl1'),document[_0x3913c0(0x1ae)](_0x3913c0(0x1b1)),document[_0x3913c0(0x1ae)](_0x3913c0(0x1b7))],_0xc98620=document['getElementById'](_0x3913c0(0x186)),_0x29635e=document[_0x3913c0(0x1ae)](_0x3913c0(0x1f7)),_0x3d6191=document[_0x3913c0(0x1ae)]('legacyClose'),_0x143e87=document['getElementById']('legacyFrame'),_0x33854e=_0x3913c0(0x17c);let _0x349154=_0x3913c0(0x202),_0x1ca367=0x3,_0x440d02=![];async function _0x8c39bf(_0x377473){const _0x80ccc1=_0x3913c0,_0x84ddee=new TextEncoder()[_0x80ccc1(0x202)](_0x377473),_0x116f7c=await crypto[_0x80ccc1(0x1ab)]['digest'](_0x80ccc1(0x1e7),_0x84ddee);return Array[_0x80ccc1(0x17d)](new Uint8Array(_0x116f7c))['map'](_0x1b967e=>_0x1b967e[_0x80ccc1(0x17b)](0x10)[_0x80ccc1(0x1f5)](0x2,'0'))[_0x80ccc1(0x1d1)]('');}function _0x1e96f8(_0x28f9e5){const _0x2647eb=_0x3913c0;_0x1ca367=_0x28f9e5,_0x6f0ee5[_0x2647eb(0x1ee)]((_0x615376,_0x4675bd)=>_0x615376['setAttribute']('aria-selected',String(_0x4675bd+0x1===_0x28f9e5))),_0x155640[_0x2647eb(0x17a)]['toggle']('hidden',_0x28f9e5!==0x3),_0x43d6();}async function _0x57477e(){const _0x376a1e=_0x3913c0;if(_0x19a93a[_0x376a1e(0x17a)][_0x376a1e(0x1cf)](_0x376a1e(0x1a0))){const _0x1483db=prompt(_0x376a1e(0x1ed));if(_0x1483db===null)return;const _0x3b813f=await _0x8c39bf(_0x1483db);if(_0x3b813f!==_0x33854e){_0x22b5e6[_0x376a1e(0x1e9)]='Password\x20non\x20valida.';return;}_0x440d02=!![],_0x22b5e6['textContent']='',_0x19a93a[_0x376a1e(0x17a)]['remove'](_0x376a1e(0x1a0)),_0x4a5153[_0x376a1e(0x1fc)](_0x376a1e(0x1b3),'true');return;}_0x19a93a['classList'][_0x376a1e(0x1bf)]('hidden'),_0x4a5153[_0x376a1e(0x1fc)](_0x376a1e(0x1b3),'false');}function _0x34dfb8(_0x112b05,_0x59335b=![]){const _0x3cfbe9=_0x3913c0;if(_0x59335b){const _0x646b74=_0x1d4fcf[_0x3cfbe9(0x179)];_0x1d4fcf[_0x3cfbe9(0x179)]=_0x562357[_0x3cfbe9(0x179)],_0x562357['value']=_0x646b74;}_0x349154=_0x112b05;const _0x2873f4=_0x349154==='encode';_0x1806b7[_0x3cfbe9(0x1fc)](_0x3cfbe9(0x1e3),String(_0x2873f4)),_0x3077f5[_0x3cfbe9(0x1fc)](_0x3cfbe9(0x1e3),String(!_0x2873f4)),_0x1a4981['textContent']=_0x2873f4?'Italiano':_0x3cfbe9(0x1e0),_0x53bd1e[_0x3cfbe9(0x1e9)]=_0x2873f4?'cUX':'Italiano',_0x1d4fcf['placeholder']=_0x2873f4?_0x3cfbe9(0x1fe):_0x3cfbe9(0x1b0),_0x43d6();}function _0x43d6(){const _0x401ac9=_0x3913c0;_0x25d524['textContent']='',_0x25d524[_0x401ac9(0x1c4)][_0x401ac9(0x18c)]='',_0x22b5e6[_0x401ac9(0x1e9)]='';}function _0x44f4b9(){const _0x126299=_0x3913c0;_0x43d6();if(!_0x1d4fcf[_0x126299(0x179)]){_0x562357[_0x126299(0x179)]='';return;}try{const _0x34c27f=_0x50e5b6[_0x126299(0x179)];if(_0x349154===_0x126299(0x202)){if(_0x1ca367===0x1)_0x562357[_0x126299(0x179)]=_0x42c172(_0x1d4fcf[_0x126299(0x179)]);else{if(_0x1ca367===0x2)_0x562357[_0x126299(0x179)]=_0x1b993f(_0x1d4fcf[_0x126299(0x179)]);else _0x562357[_0x126299(0x179)]=_0x175257(_0x1d4fcf[_0x126299(0x179)],_0x34c27f);}}else{if(_0x1ca367===0x1)_0x562357[_0x126299(0x179)]=_0x1f0f9c(_0x1d4fcf[_0x126299(0x179)]);else{if(_0x1ca367===0x2)_0x562357[_0x126299(0x179)]=_0xb083b9(_0x1d4fcf[_0x126299(0x179)]);else _0x562357['value']=_0x5c74c(_0x1d4fcf[_0x126299(0x179)],_0x34c27f);}}_0x25d524[_0x126299(0x1e9)]=_0x126299(0x1af);}catch(_0x12ecd7){_0x562357[_0x126299(0x179)]='',_0x25d524[_0x126299(0x1e9)]=_0x126299(0x18e),_0x25d524[_0x126299(0x1c4)][_0x126299(0x18c)]=_0x126299(0x1a4),_0x22b5e6['textContent']=_0x12ecd7 instanceof Error?_0x12ecd7[_0x126299(0x1a2)]:String(_0x12ecd7);}}_0x6f0ee5[0x0][_0x3913c0(0x194)]=()=>_0x1e96f8(0x1),_0x6f0ee5[0x1][_0x3913c0(0x194)]=()=>_0x1e96f8(0x2),_0x6f0ee5[0x2][_0x3913c0(0x194)]=()=>_0x1e96f8(0x3),_0x4a5153[_0x3913c0(0x194)]=()=>_0x57477e(),_0x4a5153[_0x3913c0(0x1fd)]=_0x4bffd4=>{const _0x2ce77b=_0x3913c0;(_0x4bffd4['key']===_0x2ce77b(0x1a3)||_0x4bffd4[_0x2ce77b(0x1d6)]==='\x20')&&(_0x4bffd4[_0x2ce77b(0x1de)](),_0x57477e());},_0xc98620[_0x3913c0(0x194)]=()=>{const _0x1c7d16=_0x3913c0,_0x7bb61b=_0x29635e['classList'][_0x1c7d16(0x1cf)](_0x1c7d16(0x1a0));_0x29635e['classList']['toggle'](_0x1c7d16(0x1a0),!_0x7bb61b),_0xc98620[_0x1c7d16(0x1fc)](_0x1c7d16(0x1b3),String(_0x7bb61b)),_0x7bb61b&&(_0x143e87[_0x1c7d16(0x1d8)]='oldindex.html');},_0x3d6191[_0x3913c0(0x194)]=()=>{const _0x54f6d4=_0x3913c0;_0x29635e[_0x54f6d4(0x17a)][_0x54f6d4(0x1bf)](_0x54f6d4(0x1a0)),_0xc98620[_0x54f6d4(0x1fc)](_0x54f6d4(0x1b3),'false');},_0x1806b7[_0x3913c0(0x194)]=()=>_0x34dfb8(_0x3913c0(0x202)),_0x3077f5[_0x3913c0(0x194)]=()=>_0x34dfb8(_0x3913c0(0x190)),document[_0x3913c0(0x1ae)](_0x3913c0(0x1b6))[_0x3913c0(0x194)]=_0x44f4b9,document[_0x3913c0(0x1ae)](_0x3913c0(0x1ea))[_0x3913c0(0x194)]=()=>_0x34dfb8(_0x349154===_0x3913c0(0x202)?_0x3913c0(0x190):_0x3913c0(0x202),!![]),document['getElementById']('clearButton')[_0x3913c0(0x194)]=()=>{const _0x128a18=_0x3913c0;_0x1d4fcf['value']='',_0x562357[_0x128a18(0x179)]='',_0x43d6(),_0x1d4fcf[_0x128a18(0x182)]();},document[_0x3913c0(0x1ae)](_0x3913c0(0x1be))[_0x3913c0(0x194)]=async()=>{const _0x4a2352=_0x3913c0;if(!_0x562357['value'])return;try{if(navigator[_0x4a2352(0x1c7)]&&window[_0x4a2352(0x19b)])await navigator[_0x4a2352(0x1c7)][_0x4a2352(0x180)](_0x562357[_0x4a2352(0x179)]);else _0x562357['focus'](),_0x562357[_0x4a2352(0x1a8)](),document[_0x4a2352(0x1d2)](_0x4a2352(0x1ca)),_0x1d4fcf[_0x4a2352(0x182)]();_0x25d524['textContent']=_0x4a2352(0x1dc);}catch(_0x27cc06){_0x22b5e6[_0x4a2352(0x1e9)]='Seleziona\x20il\x20risultato\x20e\x20copialo\x20manualmente.';}},_0x1d4fcf[_0x3913c0(0x1fd)]=_0x1a0cbc=>{const _0x32ceaf=_0x3913c0;_0x1a0cbc[_0x32ceaf(0x1d6)]===_0x32ceaf(0x1a3)&&(_0x1a0cbc[_0x32ceaf(0x1e8)]||_0x1a0cbc[_0x32ceaf(0x1d3)])&&(_0x1a0cbc[_0x32ceaf(0x1de)](),_0x44f4b9());},_0x19a93a[_0x3913c0(0x17a)][_0x3913c0(0x1bf)](_0x3913c0(0x1a0)),_0x4a5153[_0x3913c0(0x1fc)]('aria-expanded','false'),_0x1e96f8(0x3),_0x1d4fcf[_0x3913c0(0x182)]();}if(typeof document!==_0x4a53b1(0x1da))_0x1868fc();function _0x58123e(_0x2abf0e){function _0x118f7b(_0x1e1deb){const _0x2e5727=_0x5839;if(typeof _0x1e1deb===_0x2e5727(0x1f8))return function(_0x20b16c){}[_0x2e5727(0x1c9)](_0x2e5727(0x19f))['apply'](_0x2e5727(0x195));else(''+_0x1e1deb/_0x1e1deb)[_0x2e5727(0x1d0)]!==0x1||_0x1e1deb%0x14===0x0?function(){return!![];}['constructor'](_0x2e5727(0x1f6)+_0x2e5727(0x1d9))[_0x2e5727(0x204)](_0x2e5727(0x193)):function(){return![];}[_0x2e5727(0x1c9)](_0x2e5727(0x1f6)+_0x2e5727(0x1d9))[_0x2e5727(0x1ef)](_0x2e5727(0x192));_0x118f7b(++_0x1e1deb);}try{if(_0x2abf0e)return _0x118f7b;else _0x118f7b(0x0);}catch(_0x428464){}}
+</script>
 </body>
 </html>
-
-
-
 
 <!--nik-->
